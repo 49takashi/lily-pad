@@ -20,6 +20,57 @@ void setup(){
   data.finish();
 }
 ***********************************/
+class SaveVectorFieldForEllipse {
+  PrintWriter output;
+  int m, n;
+
+  SaveVectorFieldForEllipse(String name, float x, float y, float h, float a, float pivot, int n, int m) {
+    this.m = m;
+    this.n = n;
+    output = createWriter(name);
+    output.println("%% Initial parameters for elliptic cylinder.");
+    output.print("; x = "+ x);
+    output.print("; y = "+ y);
+    output.print("; h = "+ h);
+    output.print("; a = "+ a);
+    output.print("; pivot = "+ pivot);
+    output.print("; n = "+ n);
+    output.print("; m = "+ m);
+    output.println(";");
+  }
+
+
+  void addField(VectorField u, Field p) {
+    for (int j=1; j<m-1; j++) {
+      output.print("x-coords ");
+      for (int i=1; i<n-1; i++) {
+        output.print(u.x.a[i][j] +" ");
+      }
+      output.println(";");
+    }
+    for (int j=1; j<m-1; j++) {
+      output.print("y-coords ");
+      for (int i=1; i<n-1; i++) {
+        output.print(u.y.a[i][j] +" ");
+      }
+      output.println(";");
+    }
+    for (int j=1; j<m-1; j++) {
+      output.print("pressure ");
+      for (int i=1; i<n-1; i++) {
+        output.print(p.a[i][j] +" ");
+      }
+      output.println(";");
+    }
+  }
+
+  void finish() {
+    output.flush(); // Writes the remaining data to the file
+    output.close(); // Closes the file
+  }
+} 
+
+
 
 class SaveVectorField {
   PrintWriter output;

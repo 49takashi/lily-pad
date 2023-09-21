@@ -16,84 +16,100 @@ import java.util.Random;
 BDIM flow;
 Body body;
 FloodPlot flood;
-//SaveVectorFieldForEllipse data;
-SaveVectorFieldFromBoundary data;
+SaveVectorFieldForEllipse data;
 DiscNACA foil;
 float t = 0., u = 0.;
-int iter = 0, max_iter = 10;
-float stime = 300., etime = 400.;
-String lines;  // Array to store lines from the text file
-float[][] points;
-float[] point;
-float x;
-float y;
+int iter = 0, max_iter = 200;
+float stime = 300., etime = 500.;
 
 void setup(){
   size(700,700);                             // display window size
 }
 
-float[][] parse_string(String lines) {
-  
-  // Remove square brackets and spaces
-  lines = lines.replaceAll("\\[|\\]|\\s", "");
-  // Split the string into individual elements based on commas
-  String[] elements = split(lines, ',');
-  // Determine the number of rows and columns in the array
-  int rows = elements.length / 3; // Each point has three values: x, y, z
-  int cols = 3; // Assuming three columns for x, y, z
-
-  // Create a 2D array of floats
-  points = new float[rows][cols];
-  
-  // Convert the elements to floats and populate the array
-  int index = 0;
-  for (int i = 0; i < rows; i++) {
-    for (int j = 0; j < cols; j++) {
-      points[i][j] = float(elements[index]);
-      index++;
-    }
-  }
-  // Print the array for verification
-  //for (int i = 0; i < rows; i++) {
-  //  for (int j = 0; j < 2; j++) {
-  //    print(points[i][j] + "\t");
-  //  }
-  //  println();
-  //}
- 
-  return points;
-}
-
 void customsetup(int iteration){  
   // Create a Random object
-  size(700,700); 
-  int n=(int)pow(2,6); 
-  Window view = new Window(n,n);
+  Random random = new Random();
+  int boundarylowerBound = 0;
+  int boundaryupperBound = 1;
+  int boundarynum = boundarylowerBound + random.nextInt(boundaryupperBound - boundarylowerBound + 1);
+  //System.out.println("Random integer: " + xrandomInteger);
+  //int boundarynum = 1;
 
-  lines = loadStrings("/Users/weilong/data/boundary_test2/sim_0/boundary_"+str(iteration)+".txt")[0];
-  points = parse_string(lines);
-  println("points: ", points);
-  x = points[0][0]; 
-  y = points[0][1];
+  if (boundarynum == 0) {
+    // Specify the range of random numbers you want to generate
+    float xlowerBound = -5f;
+    float xupperBound = 10f;
+    float xrandomFloat = xlowerBound + random.nextFloat() * (xupperBound - xlowerBound + 1);
+    //System.out.println("Random integer: " + xrandomInteger);
     
-  body = new GENERATED_NACA(x,y, points, view);
+    float ylowerBound = -15f;
+    float yupperBound = 15f;
+    float yrandomFloat = ylowerBound + random.nextFloat() * (yupperBound - ylowerBound + 1);
   
-  //for (int i = 0; i < points.length; i++) {
-  //  x = points[i][0]; 
-  //  y = points[i][1];
-  //  println(i, x, y);
-  //  PVector vector = new PVector(x, y);
-  //  body.coords.add(vector);
-  //  //body.coords[i][0] = float(lines[i][0]);
-  //  //body.coords[i][1] = float(lines[i][1]);
-  //}
+    float hlowerBound = 0.4;
+    float hupperBound = 1f;
+    float hrandomFloat = hlowerBound + random.nextFloat() * (hupperBound - hlowerBound);
   
-  flow = new BDIM(n,n,1.,body);             // solve for flow using BDIM
-  flood = new FloodPlot(view);               // initialize a flood plot...
-  flood.setLegend("vorticity",-.5,.5);       //    and its legend
-  
-  data = new SaveVectorFieldFromBoundary("/Users/weilong/data/design/simulation_"+str(iteration)+".txt", 64, 64);
+    float alowerBound = 1f;
+    float aupperBound = 5f;
+    float arandomFloat = alowerBound + random.nextFloat() * (aupperBound - alowerBound);
 
+    float rotlowerBound = -1f;
+    float rotupperBound = 1f;
+    float rotrandomFloat = rotlowerBound + random.nextFloat() * (rotupperBound - rotlowerBound);
+
+    size(700,700); 
+    int n=(int)pow(2,6); 
+    float L = n/4., l = 0.2;                   // length-scale in grid units
+    float x = n/3 + xrandomFloat, y = n/2 + yrandomFloat;
+    float h = L*l*hrandomFloat, a = l*arandomFloat, pivot=0.5;
+    Window view = new Window(n,n);
+    body = new EllipseBody(x,y,h,a,view); // define geom
+    body.rotate(rotrandomFloat);
+    flow = new BDIM(n,n,1.,body);               // solve for flow using BDIM
+    flood = new FloodPlot(view);                // intialize a flood plot...
+    flood.setLegend("vorticity",-.5,.5);        //    and its legend
+    
+    data = new SaveVectorFieldForEllipse("saved/naca_ellipse_test_"+str(iteration)+".txt", x, y, h, a, pivot, n, n);
+  }
+  else if (boundarynum == 1) {
+    // Specify the range of random numbers you want to generate
+    float xlowerBound = -5f;
+    float xupperBound = 10f;
+    float xrandomFloat = xlowerBound + random.nextFloat() * (xupperBound - xlowerBound + 1);
+    //System.out.println("Random integer: " + xrandomInteger);
+    
+    float ylowerBound = -10f;
+    float yupperBound = 10f;
+    float yrandomFloat = ylowerBound + random.nextFloat() * (yupperBound - ylowerBound + 1);
+  
+    float hlowerBound = -3f;
+    float hupperBound = 3f;
+    float hrandomFloat = hlowerBound + random.nextFloat() * (hupperBound - hlowerBound);
+  
+    float alowerBound = -0.1;
+    float aupperBound = 0.3;
+    float arandomFloat = alowerBound + random.nextFloat() * (aupperBound - alowerBound);
+
+    float rotlowerBound = -1f;
+    float rotupperBound = 1f;
+    float rotrandomFloat = rotlowerBound + random.nextFloat() * (rotupperBound - rotlowerBound);
+
+    size(700,700);                             // display window size
+    int n=(int)pow(2,6);                       // number of grid points
+    float L = n/4., l = 0.2;      
+    float x = n/3 + xrandomFloat, y = n/2 + yrandomFloat;
+    float h = 7. + hrandomFloat, a = l + arandomFloat, pivot=0.5;         // length-scale in grid units
+    Window view = new Window(n,n);
+  
+    body = new DiscNACA(x,y,h,a, view);
+    body.rotate(rotrandomFloat);
+    flow = new BDIM(n,n,1.,body);             // solve for flow using BDIM
+    flood = new FloodPlot(view);               // initialize a flood plot...
+    flood.setLegend("vorticity",-.5,.5);       //    and its legend
+    
+    data = new SaveVectorFieldForEllipse("saved/naca_ellipse_test_"+str(iteration)+".txt", x, y, h, a, pivot, n, n);
+  }
 }
 void draw(){
   if ((t == 0.) && (iter < max_iter)){
@@ -114,7 +130,7 @@ void draw(){
     body.display();      
     data.addField(flow.u, flow.p);
     PrintWriter output;
-    output = createWriter("/Users/weilong/data/design/sim_"+str(iter)+"/boundary_"+str(int(t-stime))+".txt");
+    output = createWriter("boundary_test/sim_"+str(iter)+"/boundary_"+str(int(t-stime))+".txt");
     output.print(body.coords);
     output.flush();                           // Writes the remaining data to the file
     output.close();                           // Closes the file

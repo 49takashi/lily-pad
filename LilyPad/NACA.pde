@@ -65,6 +65,17 @@ class NACA extends Body{
   }
 }
 
+
+class GENERATED_NACA extends Body{  
+  GENERATED_NACA( float x, float y, float[][] points, Window window ){
+    super(x,y,window);
+    for (int i = 0; i < points.length; i++) {
+      add(points[i][0], points[i][1]);
+    }
+    end(); // finalizes shape
+  }
+}
+
 class DiscNACA extends Body{
   int m = 20;
   float c, FoilArea;

@@ -3,6 +3,7 @@ NACA airfoil class
 
 example code:
 
+
 NACA foil;
 void setup(){
   size(400,400);

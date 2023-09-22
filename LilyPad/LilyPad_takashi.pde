@@ -11,6 +11,7 @@ the top of each tab. Copy/paste them here to run, but you
 can only have one setup & run at a time.
 
 *********************************************************/
+/*
 import java.util.Random;
 
 
@@ -148,7 +149,7 @@ void draw(){
   }
 }
 
-
+*/
 /*
 import java.util.Random;
 

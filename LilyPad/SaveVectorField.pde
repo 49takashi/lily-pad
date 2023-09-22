@@ -23,9 +23,10 @@ void setup(){
 ***********************************/
 class SaveVectorFieldForEllipse {
   PrintWriter output;
+  PrintWriter output1;
   int m, n;
 
-  SaveVectorFieldForEllipse(String name, float x, float y, float h, float a, float pivot, int n, int m) {
+  SaveVectorFieldForEllipse(String name, float x, float y, float h, float a, float pivot, int n, int m, int iteration) {
     this.m = m;
     this.n = n;
     output = createWriter(name);
@@ -38,6 +39,8 @@ class SaveVectorFieldForEllipse {
     output.print("; n = "+ n);
     output.print("; m = "+ m);
     output.println(";");
+    
+    output1 = createWriter("force/sim_"+str(iteration)+".txt");
   }
 
 
@@ -65,9 +68,20 @@ class SaveVectorFieldForEllipse {
     }
   }
 
+  void addForce(BodyUnion bodyunion, Field p) {
+    output1.print("(x-force, y-force): ");
+    for (int k=0; k < 3; k++) {
+      output1.print(bodyunion.bodyList.get(k).pressForce(p) +" ");
+      output1.print(", ");
+    }
+    output1.println(" ;; ");
+  }
+  
   void finish() {
     output.flush(); // Writes the remaining data to the file
     output.close(); // Closes the file
+    output1.flush(); // Writes the remaining data to the file
+    output1.close(); // Closes the file
   }
 } 
 

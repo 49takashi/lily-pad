@@ -13,6 +13,330 @@ can only have one setup & run at a time.
 *********************************************************/
 import java.util.Random;
 
+BodyUnion bodyunion;
+
+BDIM flow;
+Body body;
+Body body2;
+Body body3;
+
+FloodPlot flood;
+SaveVectorFieldForEllipse data;
+DiscNACA foil;
+float t = 0., u = 0.;
+//int iter = 0, max_iter = 200;
+int iter = 0, max_iter = 5;
+float stime = 300., etime = 500.;
+
+void setup(){
+  size(700,700);                             // display window size
+}
+
+void customsetup(int iteration){  
+  // Create a Random object
+  Random random = new Random();
+  int boundarylowerBound = 0;
+  int boundaryupperBound = 1;
+  int boundarynum = boundarylowerBound + random.nextInt(boundaryupperBound - boundarylowerBound + 1);
+  //System.out.println("Random integer: " + xrandomInteger);
+  //int boundarynum = 1;
+
+  if (boundarynum == 0) {
+    size(700,700); 
+    int n=(int)pow(2,6); 
+    float L = n/4., l = 0.2;                   // length-scale in grid units
+    Window view = new Window(n,n);
+    
+    
+    ////// 1st body ///////
+    // Specify the range of random numbers you want to generate
+    float xlowerBound = -0f;
+    float xupperBound = 5f;
+    float xrandomFloat = xlowerBound + random.nextFloat() * (xupperBound - xlowerBound + 1);
+    //System.out.println("Random integer: " + xrandomInteger);
+    
+    float ylowerBound = -5f;
+    float yupperBound = 5f;
+    float yrandomFloat = ylowerBound + random.nextFloat() * (yupperBound - ylowerBound + 1);
+  
+    float hlowerBound = 0.4;
+    float hupperBound = 1f;
+    float hrandomFloat = hlowerBound + random.nextFloat() * (hupperBound - hlowerBound);
+  
+    float alowerBound = 1f;
+    float aupperBound = 5f;
+    float arandomFloat = alowerBound + random.nextFloat() * (aupperBound - alowerBound);
+
+    float rotlowerBound = -1f;
+    float rotupperBound = 1f;
+    float rotrandomFloat = rotlowerBound + random.nextFloat() * (rotupperBound - rotlowerBound);
+
+    float x = n/4 + xrandomFloat, y = n/2 + yrandomFloat;
+    float h = L*l*hrandomFloat, a = l*arandomFloat;
+    body = new EllipseBody(x,y,h,a,view); // define geom
+    body.rotate(rotrandomFloat);
+    
+    
+    ////// 2nd body ///////
+    // Specify the range of random numbers you want to generate
+    float xlowerBound2 = -0f;
+    float xupperBound2 = 5f;
+    float xrandomFloat2 = xlowerBound2 + random.nextFloat() * (xupperBound2 - xlowerBound2 + 1);
+    //System.out.println("Random integer: " + xrandomInteger);
+    
+    float ylowerBound2 = -5f;
+    float yupperBound2 = 5f;
+    float yrandomFloat2 = ylowerBound2 + random.nextFloat() * (yupperBound2 - ylowerBound2 + 1);
+  
+    float hlowerBound2 = 0.4;
+    float hupperBound2 = 1f;
+    float hrandomFloat2 = hlowerBound2 + random.nextFloat() * (hupperBound2 - hlowerBound2);
+  
+    float alowerBound2 = 1f;
+    float aupperBound2 = 5f;
+    float arandomFloat2 = alowerBound2 + random.nextFloat() * (aupperBound2 - alowerBound2);
+
+    float rotlowerBound2 = -1f;
+    float rotupperBound2 = 1f;
+    float rotrandomFloat2 = rotlowerBound2 + random.nextFloat() * (rotupperBound2 - rotlowerBound2);
+
+    float x2 = n/2 + xrandomFloat2, y2 = n/3 + yrandomFloat2;
+    float h2 = L*l*hrandomFloat2, a2 = l*arandomFloat2;
+    body2 = new EllipseBody(x2,y2,h2,a2,view); // define geom
+    body2.rotate(rotrandomFloat2);
+    
+    
+    ////// 3rd body ///////
+    // Specify the range of random numbers you want to generate
+    float xlowerBound3 = -0f;
+    float xupperBound3 = 5f;
+    float xrandomFloat3 = xlowerBound3 + random.nextFloat() * (xupperBound3 - xlowerBound3 + 1);
+    //System.out.println("Random integer: " + xrandomInteger);
+    
+    float ylowerBound3 = -5f;
+    float yupperBound3 = 5f;
+    float yrandomFloat3 = ylowerBound3 + random.nextFloat() * (yupperBound3 - ylowerBound3 + 1);
+  
+    float hlowerBound3 = 0.4;
+    float hupperBound3 = 1f;
+    float hrandomFloat3 = hlowerBound3 + random.nextFloat() * (hupperBound3 - hlowerBound3);
+  
+    float alowerBound3 = 1f;
+    float aupperBound3 = 5f;
+    float arandomFloat3 = alowerBound3 + random.nextFloat() * (aupperBound3 - alowerBound3);
+
+    float rotlowerBound3 = -1f;
+    float rotupperBound3 = 1f;
+    float rotrandomFloat3 = rotlowerBound3 + random.nextFloat() * (rotupperBound3 - rotlowerBound3);
+
+    float x3 = n/2 + xrandomFloat3, y3 = 2*n/3 + yrandomFloat3;
+    float h3 = L*l*hrandomFloat3, a3 = l*arandomFloat3;
+    body3 = new EllipseBody(x3,y3,h3,a3,view); // define geom
+    body3.rotate(rotrandomFloat3);
+    
+    bodyunion = new BodyUnion(body, body2);
+    bodyunion.add(body3);
+    
+    flow = new BDIM(n,n,1.,bodyunion);               // solve for flow using BDIM
+    flood = new FloodPlot(view);                // intialize a flood plot...
+    flood.setLegend("vorticity",-.5,.5);        //    and its legend
+    
+    float pivot=0.5;
+    data = new SaveVectorFieldForEllipse("saved/naca_ellipse_train_"+str(iteration)+".txt", x, y, h, a, pivot, n, n, iteration);
+  }
+  else if (boundarynum == 1) {
+    size(700,700);                             // display window size
+    int n=(int)pow(2,6);                       // number of grid points
+    float l = 0.2;      
+    Window view = new Window(n,n);
+
+    // Specify the range of random numbers you want to generate
+    float xlowerBound = -0f;
+    float xupperBound = 5f;
+    float xrandomFloat = xlowerBound + random.nextFloat() * (xupperBound - xlowerBound + 1);
+    //System.out.println("Random integer: " + xrandomInteger);
+    
+    float ylowerBound = -5f;
+    float yupperBound = 5f;
+    float yrandomFloat = ylowerBound + random.nextFloat() * (yupperBound - ylowerBound + 1);
+  
+    float hlowerBound = -1.5f;
+    float hupperBound = 1.5f;
+    float hrandomFloat = hlowerBound + random.nextFloat() * (hupperBound - hlowerBound);
+  
+    float alowerBound = -0.05;
+    float aupperBound = 0.15;
+    float arandomFloat = alowerBound + random.nextFloat() * (aupperBound - alowerBound);
+
+    float rotlowerBound = -1f;
+    float rotupperBound = 1f;
+    float rotrandomFloat = rotlowerBound + random.nextFloat() * (rotupperBound - rotlowerBound);
+
+    float x = n/4 + xrandomFloat, y = n/2 + yrandomFloat;
+    float h = 7. + hrandomFloat, a = l + arandomFloat;         // length-scale in grid units    
+  
+    body = new DiscNACA(x,y,h,a, view);
+    body.rotate(rotrandomFloat);
+
+
+    // Specify the range of random numbers you want to generate
+    float xlowerBound2 = -0f;
+    float xupperBound2 = 5f;
+    float xrandomFloat2 = xlowerBound2 + random.nextFloat() * (xupperBound2 - xlowerBound2 + 1);
+    //System.out.println("Random integer: " + xrandomInteger);
+    
+    float ylowerBound2 = -5f;
+    float yupperBound2 = 2f;
+    float yrandomFloat2 = ylowerBound2 + random.nextFloat() * (yupperBound2 - ylowerBound2 + 1);
+  
+    float hlowerBound2 = -1.5f;
+    float hupperBound2 = 1.5f;
+    float hrandomFloat2 = hlowerBound2 + random.nextFloat() * (hupperBound2 - hlowerBound2);
+  
+    float alowerBound2 = -0.05;
+    float aupperBound2 = 0.15;
+    float arandomFloat2 = alowerBound2 + random.nextFloat() * (aupperBound2 - alowerBound2);
+
+    float rotlowerBound2 = -1f;
+    float rotupperBound2 = 1f;
+    float rotrandomFloat2 = rotlowerBound2 + random.nextFloat() * (rotupperBound2 - rotlowerBound2);
+
+    float x2 = n/2 + xrandomFloat2, y2 = n/3 + yrandomFloat2;
+    float h2 = 7. + hrandomFloat2, a2 = l + arandomFloat2;         // length-scale in grid units    
+  
+    body2 = new DiscNACA(x2,y2,h2,a2, view);
+    body2.rotate(rotrandomFloat2);
+    
+
+    // Specify the range of random numbers you want to generate
+    float xlowerBound3 = -0f;
+    float xupperBound3 = 5f;
+    float xrandomFloat3 = xlowerBound3 + random.nextFloat() * (xupperBound3 - xlowerBound3 + 1);
+    //System.out.println("Random integer: " + xrandomInteger);
+    
+    float ylowerBound3 = -2f;
+    float yupperBound3 = 5f;
+    float yrandomFloat3 = ylowerBound3 + random.nextFloat() * (yupperBound3 - ylowerBound3 + 1);
+  
+    float hlowerBound3 = -1.5f;
+    float hupperBound3 = 1.5f;
+    float hrandomFloat3 = hlowerBound3 + random.nextFloat() * (hupperBound3 - hlowerBound3);
+  
+    float alowerBound3 = -0.05;
+    float aupperBound3 = 0.15;
+    float arandomFloat3 = alowerBound3 + random.nextFloat() * (aupperBound3 - alowerBound3);
+
+    float rotlowerBound3 = -1f;
+    float rotupperBound3 = 1f;
+    float rotrandomFloat3 = rotlowerBound3 + random.nextFloat() * (rotupperBound3 - rotlowerBound3);
+
+    float x3 = n/2 + xrandomFloat3, y3 = 2*n/3 + yrandomFloat3;
+    float h3 = 7. + hrandomFloat3, a3 = l + arandomFloat3;         // length-scale in grid units    
+  
+    body3 = new DiscNACA(x3,y3,h3,a3, view);
+    body3.rotate(rotrandomFloat3);
+    
+    bodyunion = new BodyUnion(body, body2);
+    bodyunion.add(body3);    
+    
+    flow = new BDIM(n,n,1.,bodyunion);             // solve for flow using BDIM
+    flood = new FloodPlot(view);               // initialize a flood plot...
+    flood.setLegend("vorticity",-.5,.5);       //    and its legend
+
+    float pivot=0.5;
+    data = new SaveVectorFieldForEllipse("saved/naca_ellipse_train_"+str(iteration)+".txt", x, y, h, a, pivot, n, n, iteration);
+  }
+}
+void draw(){
+  if ((t == 0.) && (iter < max_iter)){
+    customsetup(iter);
+  }
+  if(t<stime){  // run simulation until t<Time
+    bodyunion.follow();                             // update the body
+    flow.update(bodyunion); flow.update2();         // 2-step fluid update
+    flood.display(flow.u.curl());              // compute and display vorticity
+    bodyunion.display();      
+    t+=flow.dt;
+    //System.out.println(t);
+    //System.out.println(flow.dt);
+  }else if((stime<= t) && (t<etime)){  // run simulation until t<Time
+    bodyunion.follow();                             // update the body
+    flow.update(bodyunion); flow.update2();         // 2-step fluid update
+    flood.display(flow.u.curl());              // compute and display vorticity
+    bodyunion.display();      
+    data.addField(flow.u, flow.p);
+    data.addForce(bodyunion, flow.p);
+    if (stime == t){
+      for (int i = 0; i < 3; i++) {
+        PrintWriter output;
+        output = createWriter("boundary_training/sim_"+str(iter)+"/boundary_"+str(i)+".txt");
+        output.print(bodyunion.bodyList.get(i).coords);
+        output.flush();                           // Writes the remaining data to the file
+        output.close();                           // Closes the file
+      }    
+    }
+    t+=flow.dt;
+  }
+  else{  // close and save everything when t>Time
+    data.finish();
+    t = 0.;
+    iter+=1;
+    //exit();
+  }
+  if (max_iter <= iter){  // close and save everything when t>Time
+    exit();
+  }
+}
+
+
+/*
+BodyUnion body;
+Body singlebody;
+Body singlebody1;
+BDIM flow;
+FloodPlot flood;
+
+void setup(){
+  int n=(int)pow(2,6);
+  size(700,700);
+  Window view = new Window(n,n);
+
+  singlebody = new NACA(35,20,14,0.2,view);
+  singlebody.rotate(0.05);
+
+  singlebody1 = new NACA(30,40,14,0.2,view);
+  singlebody1.rotate(-0.09);
+
+  body = new BodyUnion( singlebody, singlebody1);
+  
+  singlebody1 = new NACA(20,30,14,0.2,view);
+  singlebody1.rotate(-0.1);
+  
+  body.add(singlebody1);
+
+  //body.add(new NACA(30,35,12,0.2,view));
+  //body.add(new NACA(20,50,12, 0.2, view));
+  //body.rotate(0.01);
+  
+  flow = new BDIM(n,n,1.,body);             // solve for flow using BDIM
+  flood = new FloodPlot(view);               // initialize a flood plot...
+  flood.setLegend("vorticity",-.5,.5);       //    and its legend
+
+}
+void draw(){
+  background(0);
+  body.follow(); // uncomment to move as a group
+  flow.update(body); flow.update2();         // 2-step fluid update
+  flood.display(flow.u.curl());              // compute and display vorticity
+  //for (Body child : body.bodyList) child.follow(); // uncomment to move individually
+  body.display();
+}
+//void mousePressed(){body.mousePressed();}
+//void mouseReleased(){body.mouseReleased();}
+*/
+
+/*
+import java.util.Random;
 
 BDIM flow;
 Body body;
@@ -131,7 +455,7 @@ void draw(){
     exit();
   }
 }
-
+*/
 
 /*
 import java.util.Random;

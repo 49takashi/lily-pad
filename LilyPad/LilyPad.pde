@@ -14,7 +14,6 @@ can only have one setup & run at a time.
 import java.util.Random;
 
 BodyUnion bodyunion;
-
 BDIM flow;
 Body body;
 Body body2;

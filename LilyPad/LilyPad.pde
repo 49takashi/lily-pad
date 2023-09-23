@@ -58,19 +58,19 @@ void customsetup(int iteration){
     float ylowerBound = -5f;
     float yupperBound = 5f;
     float yrandomFloat = ylowerBound + random.nextFloat() * (yupperBound - ylowerBound + 1);
-  
+    
     float hlowerBound = 0.4;
     float hupperBound = 1f;
     float hrandomFloat = hlowerBound + random.nextFloat() * (hupperBound - hlowerBound);
-  
-    float alowerBound = 1f;
+    
+    float alowerBound = 2f;
     float aupperBound = 5f;
     float arandomFloat = alowerBound + random.nextFloat() * (aupperBound - alowerBound);
-
+    
     float rotlowerBound = -1f;
     float rotupperBound = 1f;
     float rotrandomFloat = rotlowerBound + random.nextFloat() * (rotupperBound - rotlowerBound);
-
+    
     float x = n/4 + xrandomFloat, y = n/2 + yrandomFloat;
     float h = L*l*hrandomFloat, a = l*arandomFloat;
     body = new EllipseBody(x,y,h,a,view); // define geom
@@ -87,19 +87,19 @@ void customsetup(int iteration){
     float ylowerBound2 = -5f;
     float yupperBound2 = 5f;
     float yrandomFloat2 = ylowerBound2 + random.nextFloat() * (yupperBound2 - ylowerBound2 + 1);
-  
+    
     float hlowerBound2 = 0.4;
     float hupperBound2 = 1f;
     float hrandomFloat2 = hlowerBound2 + random.nextFloat() * (hupperBound2 - hlowerBound2);
-  
-    float alowerBound2 = 1f;
+    
+    float alowerBound2 = 2f;
     float aupperBound2 = 5f;
     float arandomFloat2 = alowerBound2 + random.nextFloat() * (aupperBound2 - alowerBound2);
-
+    
     float rotlowerBound2 = -1f;
     float rotupperBound2 = 1f;
     float rotrandomFloat2 = rotlowerBound2 + random.nextFloat() * (rotupperBound2 - rotlowerBound2);
-
+    
     float x2 = n/2 + xrandomFloat2, y2 = n/3 + yrandomFloat2;
     float h2 = L*l*hrandomFloat2, a2 = l*arandomFloat2;
     body2 = new EllipseBody(x2,y2,h2,a2,view); // define geom
@@ -116,19 +116,19 @@ void customsetup(int iteration){
     float ylowerBound3 = -5f;
     float yupperBound3 = 5f;
     float yrandomFloat3 = ylowerBound3 + random.nextFloat() * (yupperBound3 - ylowerBound3 + 1);
-  
+    
     float hlowerBound3 = 0.4;
     float hupperBound3 = 1f;
     float hrandomFloat3 = hlowerBound3 + random.nextFloat() * (hupperBound3 - hlowerBound3);
-  
-    float alowerBound3 = 1f;
+    
+    float alowerBound3 = 2f;
     float aupperBound3 = 5f;
     float arandomFloat3 = alowerBound3 + random.nextFloat() * (aupperBound3 - alowerBound3);
-
+    
     float rotlowerBound3 = -1f;
     float rotupperBound3 = 1f;
     float rotrandomFloat3 = rotlowerBound3 + random.nextFloat() * (rotupperBound3 - rotlowerBound3);
-
+    
     float x3 = n/2 + xrandomFloat3, y3 = 2*n/3 + yrandomFloat3;
     float h3 = L*l*hrandomFloat3, a3 = l*arandomFloat3;
     body3 = new EllipseBody(x3,y3,h3,a3,view); // define geom
@@ -159,15 +159,15 @@ void customsetup(int iteration){
     float ylowerBound = -5f;
     float yupperBound = 5f;
     float yrandomFloat = ylowerBound + random.nextFloat() * (yupperBound - ylowerBound + 1);
-  
+    
     float hlowerBound = -1.5f;
     float hupperBound = 1.5f;
     float hrandomFloat = hlowerBound + random.nextFloat() * (hupperBound - hlowerBound);
-  
+    
     float alowerBound = -0.05;
     float aupperBound = 0.15;
     float arandomFloat = alowerBound + random.nextFloat() * (aupperBound - alowerBound);
-
+    
     float rotlowerBound = -1f;
     float rotupperBound = 1f;
     float rotrandomFloat = rotlowerBound + random.nextFloat() * (rotupperBound - rotlowerBound);
@@ -269,7 +269,7 @@ void draw(){
     if (stime == t){
       for (int i = 0; i < 3; i++) {
         PrintWriter output;
-        output = createWriter("boundary_training/sim_"+str(iter)+"/boundary_"+str(i)+".txt");
+        output = createWriter("boundary_multiple/sim_"+str(iter)+"/boundary_"+str(i)+".txt");
         output.print(bodyunion.bodyList.get(i).coords);
         output.flush();                           // Writes the remaining data to the file
         output.close();                           // Closes the file

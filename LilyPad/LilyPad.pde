@@ -14,6 +14,7 @@ can only have one setup & run at a time.
 import java.util.Random;
 
 BodyUnion bodyunion;
+
 BDIM flow;
 Body body;
 Body body2;
@@ -37,6 +38,8 @@ void customsetup(int iteration){
   int boundarylowerBound = 0;
   int boundaryupperBound = 1;
   int boundarynum = boundarylowerBound + random.nextInt(boundaryupperBound - boundarylowerBound + 1);
+  int boundarynum2 = boundarylowerBound + random.nextInt(boundaryupperBound - boundarylowerBound + 1);
+  int boundarynum3 = boundarylowerBound + random.nextInt(boundaryupperBound - boundarylowerBound + 1);
   //System.out.println("Random integer: " + xrandomInteger);
   //int boundarynum = 1;
 
@@ -45,8 +48,7 @@ void customsetup(int iteration){
     int n=(int)pow(2,6); 
     float L = n/4., l = 0.2;                   // length-scale in grid units
     Window view = new Window(n,n);
-    
-    
+        
     ////// 1st body ///////
     // Specify the range of random numbers you want to generate
     float xlowerBound = -0f;
@@ -74,8 +76,49 @@ void customsetup(int iteration){
     float h = L*l*hrandomFloat, a = l*arandomFloat;
     body = new EllipseBody(x,y,h,a,view); // define geom
     body.rotate(rotrandomFloat);
+
+  }
+  else if (boundarynum == 1) {
+    size(700,700);                             // display window size
+    int n=(int)pow(2,6);                       // number of grid points
+    float l = 0.2;      
+    Window view = new Window(n,n);
+
+    // Specify the range of random numbers you want to generate
+    float xlowerBound = -0f;
+    float xupperBound = 5f;
+    float xrandomFloat = xlowerBound + random.nextFloat() * (xupperBound - xlowerBound + 1);
+    //System.out.println("Random integer: " + xrandomInteger);
     
+    float ylowerBound = -5f;
+    float yupperBound = 5f;
+    float yrandomFloat = ylowerBound + random.nextFloat() * (yupperBound - ylowerBound + 1);
     
+    float hlowerBound = -1.5f;
+    float hupperBound = 1.5f;
+    float hrandomFloat = hlowerBound + random.nextFloat() * (hupperBound - hlowerBound);
+    
+    float alowerBound = -0.05;
+    float aupperBound = 0.15;
+    float arandomFloat = alowerBound + random.nextFloat() * (aupperBound - alowerBound);
+    
+    float rotlowerBound = -1f;
+    float rotupperBound = 1f;
+    float rotrandomFloat = rotlowerBound + random.nextFloat() * (rotupperBound - rotlowerBound);
+
+    float x = n/4 + xrandomFloat, y = n/2 + yrandomFloat;
+    float h = 7. + hrandomFloat, a = l + arandomFloat;         // length-scale in grid units    
+  
+    body = new DiscNACA(x,y,h,a, view);
+    body.rotate(rotrandomFloat);
+  }
+
+  if (boundarynum2 == 0) {
+    size(700,700); 
+    int n=(int)pow(2,6); 
+    float L = n/4., l = 0.2;                   // length-scale in grid units
+    Window view = new Window(n,n);
+        
     ////// 2nd body ///////
     // Specify the range of random numbers you want to generate
     float xlowerBound2 = -0f;
@@ -104,6 +147,47 @@ void customsetup(int iteration){
     body2 = new EllipseBody(x2,y2,h2,a2,view); // define geom
     body2.rotate(rotrandomFloat2);
     
+  }
+  else if (boundarynum2 == 1) {
+    size(700,700);                             // display window size
+    int n=(int)pow(2,6);                       // number of grid points
+    float l = 0.2;      
+    Window view = new Window(n,n);
+
+    // Specify the range of random numbers you want to generate
+    float xlowerBound2 = -0f;
+    float xupperBound2 = 5f;
+    float xrandomFloat2 = xlowerBound2 + random.nextFloat() * (xupperBound2 - xlowerBound2 + 1);
+    //System.out.println("Random integer: " + xrandomInteger);
+    
+    float ylowerBound2 = -5f;
+    float yupperBound2 = 2f;
+    float yrandomFloat2 = ylowerBound2 + random.nextFloat() * (yupperBound2 - ylowerBound2 + 1);
+  
+    float hlowerBound2 = -1.5f;
+    float hupperBound2 = 1.5f;
+    float hrandomFloat2 = hlowerBound2 + random.nextFloat() * (hupperBound2 - hlowerBound2);
+  
+    float alowerBound2 = -0.05;
+    float aupperBound2 = 0.15;
+    float arandomFloat2 = alowerBound2 + random.nextFloat() * (aupperBound2 - alowerBound2);
+
+    float rotlowerBound2 = -1f;
+    float rotupperBound2 = 1f;
+    float rotrandomFloat2 = rotlowerBound2 + random.nextFloat() * (rotupperBound2 - rotlowerBound2);
+
+    float x2 = n/2 + xrandomFloat2, y2 = n/3 + yrandomFloat2;
+    float h2 = 7. + hrandomFloat2, a2 = l + arandomFloat2;         // length-scale in grid units    
+  
+    body2 = new DiscNACA(x2,y2,h2,a2, view);
+    body2.rotate(rotrandomFloat2);
+  }  
+
+  if (boundarynum3 == 0) {
+    size(700,700); 
+    int n=(int)pow(2,6); 
+    float L = n/4., l = 0.2;                   // length-scale in grid units
+    Window view = new Window(n,n);
     
     ////// 3rd body ///////
     // Specify the range of random numbers you want to generate
@@ -141,71 +225,13 @@ void customsetup(int iteration){
     flood.setLegend("vorticity",-.5,.5);        //    and its legend
     
     float pivot=0.5;
-    data = new SaveVectorFieldForEllipse("saved/naca_ellipse_train_"+str(iteration)+".txt", x, y, h, a, pivot, n, n, iteration);
+    data = new SaveVectorFieldForEllipse("saved/naca_ellipse_train_"+str(iteration)+".txt", x3, y3, h3, a3, pivot, n, n, iteration);
   }
-  else if (boundarynum == 1) {
+  else if (boundarynum3 == 1) {
     size(700,700);                             // display window size
     int n=(int)pow(2,6);                       // number of grid points
     float l = 0.2;      
     Window view = new Window(n,n);
-
-    // Specify the range of random numbers you want to generate
-    float xlowerBound = -0f;
-    float xupperBound = 5f;
-    float xrandomFloat = xlowerBound + random.nextFloat() * (xupperBound - xlowerBound + 1);
-    //System.out.println("Random integer: " + xrandomInteger);
-    
-    float ylowerBound = -5f;
-    float yupperBound = 5f;
-    float yrandomFloat = ylowerBound + random.nextFloat() * (yupperBound - ylowerBound + 1);
-    
-    float hlowerBound = -1.5f;
-    float hupperBound = 1.5f;
-    float hrandomFloat = hlowerBound + random.nextFloat() * (hupperBound - hlowerBound);
-    
-    float alowerBound = -0.05;
-    float aupperBound = 0.15;
-    float arandomFloat = alowerBound + random.nextFloat() * (aupperBound - alowerBound);
-    
-    float rotlowerBound = -1f;
-    float rotupperBound = 1f;
-    float rotrandomFloat = rotlowerBound + random.nextFloat() * (rotupperBound - rotlowerBound);
-
-    float x = n/4 + xrandomFloat, y = n/2 + yrandomFloat;
-    float h = 7. + hrandomFloat, a = l + arandomFloat;         // length-scale in grid units    
-  
-    body = new DiscNACA(x,y,h,a, view);
-    body.rotate(rotrandomFloat);
-
-
-    // Specify the range of random numbers you want to generate
-    float xlowerBound2 = -0f;
-    float xupperBound2 = 5f;
-    float xrandomFloat2 = xlowerBound2 + random.nextFloat() * (xupperBound2 - xlowerBound2 + 1);
-    //System.out.println("Random integer: " + xrandomInteger);
-    
-    float ylowerBound2 = -5f;
-    float yupperBound2 = 2f;
-    float yrandomFloat2 = ylowerBound2 + random.nextFloat() * (yupperBound2 - ylowerBound2 + 1);
-  
-    float hlowerBound2 = -1.5f;
-    float hupperBound2 = 1.5f;
-    float hrandomFloat2 = hlowerBound2 + random.nextFloat() * (hupperBound2 - hlowerBound2);
-  
-    float alowerBound2 = -0.05;
-    float aupperBound2 = 0.15;
-    float arandomFloat2 = alowerBound2 + random.nextFloat() * (aupperBound2 - alowerBound2);
-
-    float rotlowerBound2 = -1f;
-    float rotupperBound2 = 1f;
-    float rotrandomFloat2 = rotlowerBound2 + random.nextFloat() * (rotupperBound2 - rotlowerBound2);
-
-    float x2 = n/2 + xrandomFloat2, y2 = n/3 + yrandomFloat2;
-    float h2 = 7. + hrandomFloat2, a2 = l + arandomFloat2;         // length-scale in grid units    
-  
-    body2 = new DiscNACA(x2,y2,h2,a2, view);
-    body2.rotate(rotrandomFloat2);
-    
 
     // Specify the range of random numbers you want to generate
     float xlowerBound3 = -0f;
@@ -243,8 +269,9 @@ void customsetup(int iteration){
     flood.setLegend("vorticity",-.5,.5);       //    and its legend
 
     float pivot=0.5;
-    data = new SaveVectorFieldForEllipse("saved/naca_ellipse_train_"+str(iteration)+".txt", x, y, h, a, pivot, n, n, iteration);
+    data = new SaveVectorFieldForEllipse("saved/naca_ellipse_train_"+str(iteration)+".txt", x3, y3, h3, a3, pivot, n, n, iteration);
   }
+
 }
 void draw(){
   if ((t == 0.) && (iter < max_iter)){

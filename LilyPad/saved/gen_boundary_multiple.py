@@ -6,12 +6,13 @@ import os
 
 is_visualize = False
 
-
 for simnum in range(5):
     if is_visualize:
         pdf = PdfPages('../visualization/naca_ellipse_multiple_boundary_sim_{:06d}.pdf'.format(simnum))
-        
-    os.makedirs("../np_boundary_multiple/sim_{:06d}".format(simnum))
+    try:    
+        os.makedirs("../np_boundary_multiple/sim_{:06d}".format(simnum))
+    except Exception:
+        pass   
     for i in range(3):
         f = open("../boundary_multiple/sim_{0}/boundary_{1}.txt".format(simnum, i))
         data = f.read()

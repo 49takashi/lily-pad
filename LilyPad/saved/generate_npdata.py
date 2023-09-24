@@ -3,7 +3,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 import os
 
-
 for sim in range(5):
   # path="/home/ubuntu/lily-pad/LilyPad/saved/naca_ellipse_test_{0}.txt".format(sim)
   # path_vel="/home/ubuntu/lily-pad/LilyPad/dataset/naca_ellipse/test_trajectories/"

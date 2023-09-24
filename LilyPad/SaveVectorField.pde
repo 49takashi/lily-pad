@@ -21,7 +21,6 @@ void setup(){
   data.finish();
 }
 ***********************************/
-
 class SaveVectorFieldForEllipse {
   PrintWriter output;
   PrintWriter output1;

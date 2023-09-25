@@ -11,6 +11,173 @@ the top of each tab. Copy/paste them here to run, but you
 can only have one setup & run at a time.
 
 *********************************************************/
+
+import java.util.Random;
+BodyUnion bodyunion;
+BDIM flow;
+Body body1;
+Body body2;
+FloodPlot flood;
+//SaveVectorFieldForEllipse data;
+SaveVectorFieldFromBoundary data;
+DiscNACA foil;
+float t = 0., u = 0.;
+int iter = 0, max_iter = 5;
+float stime = 300., etime = 400.;
+String lines;  // Array to store lines from the text file
+String config_lines;
+float[][] configs;
+float[][] points;
+float[] point;
+float x;
+float y;
+
+void setup(){
+  size(700,700);                             // display window size
+}
+
+float[][] parse_string(String lines) {
+  
+  // Remove square brackets and spaces
+  lines = lines.replaceAll("\\[|\\]|\\s", "");
+  // Split the string into individual elements based on commas
+  String[] elements = split(lines, ',');
+  // Determine the number of rows and columns in the array
+  int rows = elements.length / 3; // Each point has three values: x, y, z
+  int cols = 3; // Assuming three columns for x, y, z
+
+  // Create a 2D array of floats
+  points = new float[rows][cols];
+  
+  // Convert the elements to floats and populate the array
+  int index = 0;
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      points[i][j] = float(elements[index]);
+      index++;
+    }
+  }
+
+  return points;
+}
+
+float[][] parse_string_config(String lines) {
+  
+  // Remove square brackets and spaces
+  lines = lines.replaceAll("\\[|\\]|\\s", "");
+  // Split the string into individual elements based on commas
+  String[] elements = split(lines, ',');
+  // Determine the number of rows and columns in the array
+  int rows = elements.length / 9; // Each point has three values: x, y, z
+  int cols = 9; // Assuming three columns for x, y, z
+
+  // Create a 2D array of floats
+  points = new float[rows][cols];
+  
+  // Convert the elements to floats and populate the array
+  int index = 0;
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      points[i][j] = float(elements[index]);
+      index++;
+    }
+  }
+
+  return points;
+}
+
+// String input_path = "/Users/weilong/data/design_evaluation/designed_boundaries/";
+// String output_sim_path = "/Users/weilong/data/design_evaluation/sim/";
+// String output_force_path = "/Users/weilong/data/design_evaluation/force/";
+// String output_boundary_path = "/Users/weilong/data/design_evaluation/reproduced_boundaries/";
+
+String input_path = "./boundary_multiple/";
+String output_sim_path = "./reporduced_simulation/sim/";
+String output_force_path = "./reproduced_force/";
+String output_boundary_path = "./reproduced_boundaries/";
+
+void customsetup(int iteration){  
+  // Create a Random object
+  size(700,700); 
+  int n=(int)pow(2,6); 
+  Window view = new Window(n,n);
+  
+  config_lines = loadStrings("./config/sim_" + str(iteration) + ".txt")[0];
+  configs = parse_string_config(config_lines);
+  
+  if(configs[0][8] == 0.){
+    body1 = new EllipseBody(configs[0][0], configs[0][1], configs[0][2], configs[0][3], view); // define geom
+    body1.rotate(configs[0][4]);     
+  }
+  else {
+    body1 = new DiscNACA(configs[0][0], configs[0][1], configs[0][2], configs[0][3], view); // define geom
+    body1.rotate(configs[0][4]);
+  }
+  if (configs[1][8] == 0.) {
+    body2 = new EllipseBody(configs[0][0], configs[0][1], configs[0][2], configs[0][3], view); // define geom
+    body2.rotate(configs[0][4]);     
+  } 
+  else {
+    body2 = new DiscNACA(configs[1][0], configs[1][1], configs[1][2], configs[1][3], view); // define geom
+    body2.rotate(configs[1][4]);
+  } 
+  
+  bodyunion = new BodyUnion(body1, body2);
+  flow = new BDIM(n,n,1.,bodyunion);             // solve for flow using BDIM
+  flood = new FloodPlot(view);               // initialize a flood plot...
+  flood.setLegend("vorticity",-.5,.5);       //    and its legend
+  
+  data = new SaveVectorFieldFromBoundary(
+    output_sim_path + "sim_" + str(iteration) + ".txt", 
+    output_force_path + "sim_" + str(iteration) + ".txt", 
+    64, 
+    64
+  );
+
+}
+void draw(){
+  if ((t == 0.) && (iter < max_iter)){
+    customsetup(iter);
+  }
+  if(t<stime){  // run simulation until t<Time
+    bodyunion.follow();                             // update the body
+    flow.update(bodyunion); flow.update2();         // 2-step fluid update
+    flood.display(flow.u.curl());              // compute and display vorticity
+    bodyunion.display();      
+    t+=flow.dt;
+    //System.out.println(t);
+    //System.out.println(flow.dt);
+  }else if((stime<= t) && (t<etime)){  // run simulation until t<Time
+    bodyunion.follow();                             // update the body
+    flow.update(bodyunion); flow.update2();         // 2-step fluid update
+    flood.display(flow.u.curl());              // compute and display vorticity
+    bodyunion.display();      
+    data.addField(flow.u, flow.p);
+    data.addForce(bodyunion, flow.p);
+
+    if (stime == t){
+      for (int i = 0; i < 2; i++) {
+        PrintWriter output;
+        output = createWriter(output_boundary_path + "sim_" + str(iter) + "/boundary_" + str(i) + ".txt");
+        output.print(bodyunion.bodyList.get(i).coords);
+        output.flush();                           // Writes the remaining data to the file
+        output.close();                           // Closes the file
+      }    
+    }
+    t+=flow.dt;
+  }
+  else{  // close and save everything when t>Time
+    data.finish();
+    t = 0.;
+    iter+=1;
+    //exit();
+  }
+  if (max_iter <= iter){  // close and save everything when t>Time
+    exit();
+  }
+}
+
+/*
 import java.util.Random;
 
 BodyUnion bodyunion;
@@ -38,9 +205,18 @@ void customsetup(int iteration){
   int boundaryupperBound = 1;
   int boundarynum = boundarylowerBound + random.nextInt(boundaryupperBound - boundarylowerBound + 1);
   int boundarynum2 = boundarylowerBound + random.nextInt(boundaryupperBound - boundarylowerBound + 1);
-  int boundarynum3 = boundarylowerBound + random.nextInt(boundaryupperBound - boundarylowerBound + 1);
+  //int boundarynum3 = boundarylowerBound + random.nextInt(boundaryupperBound - boundarylowerBound + 1);
   //System.out.println("Random integer: " + xrandomInteger);
   //int boundarynum = 1;
+  //int boundarynum2 = 1;
+
+  int x0 = 1;
+  int y0 = 1;
+  int h0 = 1;
+  int a0 = 1;
+  float pipot = 0.1;
+  int n0=(int)pow(2,6);
+  data = new SaveVectorFieldForEllipse("saved/naca_ellipse_train_"+str(iteration)+".txt", x0, y0, h0, a0, pipot, n0, n0, iteration);    
 
   if (boundarynum == 0) {
     size(700,700); 
@@ -75,7 +251,9 @@ void customsetup(int iteration){
     float h = L*l*hrandomFloat, a = l*arandomFloat;
     body = new EllipseBody(x,y,h,a,view); // define geom
     body.rotate(rotrandomFloat);
-
+    float pivot=0.5;
+    
+    data.saveConfig(x, y, h, a, rotrandomFloat, pivot, n, n, 0.);
   }
   else if (boundarynum == 1) {
     size(700,700);                             // display window size
@@ -104,12 +282,16 @@ void customsetup(int iteration){
     float rotlowerBound = -1f;
     float rotupperBound = 1f;
     float rotrandomFloat = rotlowerBound + random.nextFloat() * (rotupperBound - rotlowerBound);
+    //float rotrandomFloat = -0.3;
 
     float x = n/4 + xrandomFloat, y = n/2 + yrandomFloat;
     float h = 7. + hrandomFloat, a = l + arandomFloat;         // length-scale in grid units    
   
     body = new DiscNACA(x,y,h,a, view);
     body.rotate(rotrandomFloat);
+    float pivot=0.5;
+    
+    data.saveConfig(x, y, h, a, rotrandomFloat, pivot, n, n, 1.);
   }
 
   if (boundarynum2 == 0) {
@@ -145,7 +327,15 @@ void customsetup(int iteration){
     float h2 = L*l*hrandomFloat2, a2 = l*arandomFloat2;
     body2 = new EllipseBody(x2,y2,h2,a2,view); // define geom
     body2.rotate(rotrandomFloat2);
+    bodyunion = new BodyUnion(body, body2);
     
+    flow = new BDIM(n,n,1.,bodyunion);             // solve for flow using BDIM
+    flood = new FloodPlot(view);               // initialize a flood plot...
+    flood.setLegend("vorticity",-.5,.5);       //    and its legend
+
+    float pivot=0.5;
+    
+    data.saveConfig(x2, y2, h2, a2, rotrandomFloat2, pivot, n, n, 0.);
   }
   else if (boundarynum2 == 1) {
     size(700,700);                             // display window size
@@ -174,14 +364,24 @@ void customsetup(int iteration){
     float rotlowerBound2 = -1f;
     float rotupperBound2 = 1f;
     float rotrandomFloat2 = rotlowerBound2 + random.nextFloat() * (rotupperBound2 - rotlowerBound2);
+    //float rotrandomFloat2 = 0.1;
 
     float x2 = n/2 + xrandomFloat2, y2 = n/3 + yrandomFloat2;
     float h2 = 7. + hrandomFloat2, a2 = l + arandomFloat2;         // length-scale in grid units    
   
     body2 = new DiscNACA(x2,y2,h2,a2, view);
     body2.rotate(rotrandomFloat2);
-  }  
+    bodyunion = new BodyUnion(body, body2);
+    
+    flow = new BDIM(n,n,1.,bodyunion);             // solve for flow using BDIM
+    flood = new FloodPlot(view);               // initialize a flood plot...
+    flood.setLegend("vorticity",-.5,.5);       //    and its legend
 
+    float pivot=0.5;    
+    data.saveConfig(x2, y2, h2, a2, rotrandomFloat2, pivot, n, n, 1.);
+  }
+*/
+/*
   if (boundarynum3 == 0) {
     size(700,700); 
     int n=(int)pow(2,6); 
@@ -224,7 +424,8 @@ void customsetup(int iteration){
     flood.setLegend("vorticity",-.5,.5);        //    and its legend
     
     float pivot=0.5;
-    data = new SaveVectorFieldForEllipse("saved/naca_ellipse_train_"+str(iteration)+".txt", x3, y3, h3, a3, pivot, n, n, iteration);
+    data.saveConfig(x3, y3, h3, a3, rotrandomFloat3, pivot, n, n, 0.);
+ 
   }
   else if (boundarynum3 == 1) {
     size(700,700);                             // display window size
@@ -268,9 +469,9 @@ void customsetup(int iteration){
     flood.setLegend("vorticity",-.5,.5);       //    and its legend
 
     float pivot=0.5;
-    data = new SaveVectorFieldForEllipse("saved/naca_ellipse_train_"+str(iteration)+".txt", x3, y3, h3, a3, pivot, n, n, iteration);
-  }
-
+    data.saveConfig(x3, y3, h3, a3, rotrandomFloat3, pivot, n, n, 1.);  }
+*/
+/*
 }
 void draw(){
   if ((t == 0.) && (iter < max_iter)){
@@ -292,7 +493,7 @@ void draw(){
     data.addField(flow.u, flow.p);
     data.addForce(bodyunion, flow.p);
     if (stime == t){
-      for (int i = 0; i < 3; i++) {
+      for (int i = 0; i < bodyunion.bodyList.size(); i++) {
         PrintWriter output;
         output = createWriter("boundary_multiple/sim_"+str(iter)+"/boundary_"+str(i)+".txt");
         output.print(bodyunion.bodyList.get(i).coords);
@@ -312,7 +513,7 @@ void draw(){
     exit();
   }
 }
-
+*/
 
 /*
 BodyUnion body;

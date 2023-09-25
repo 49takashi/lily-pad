@@ -25,6 +25,7 @@ void setup(){
 class SaveVectorFieldForEllipse {
   PrintWriter output;
   PrintWriter output1;
+  PrintWriter output2;
   int m, n;
 
   SaveVectorFieldForEllipse(String name, float x, float y, float h, float a, float pivot, int n, int m, int iteration) {
@@ -42,6 +43,8 @@ class SaveVectorFieldForEllipse {
     output.println(";");
     
     output1 = createWriter("force/sim_"+str(iteration)+".txt");
+    
+    output2 = createWriter("config/sim_"+str(iteration)+".txt");
   }
 
 
@@ -78,27 +81,43 @@ class SaveVectorFieldForEllipse {
     output1.println(" ;; ");
   }
   
+  void saveConfig(float x, float y, float h, float a, float rotation, float pivot, int n, int m, Float shape) {
+    output2.print(x + ", ");
+    output2.print(y + ", ");
+    output2.print(h + ", ");
+    output2.print(a + ", " );
+    output2.print(rotation + ", ");
+    output2.print(pivot + ", ");
+    output2.print(n + ", ");
+    output2.print(m + ", ");
+    output2.print(shape + ", ");    
+  }
+  
   void finish() {
     output.flush(); // Writes the remaining data to the file
     output.close(); // Closes the file
     output1.flush(); // Writes the remaining data to the file
     output1.close(); // Closes the file
+    output2.flush(); // Writes the remaining data to the file
+    output2.close(); // Closes the file
   }
 } 
 
 
 class SaveVectorFieldFromBoundary {
   PrintWriter output;
+  PrintWriter output1;
   int m, n;
 
-  SaveVectorFieldFromBoundary(String name, int n, int m) {
+  SaveVectorFieldFromBoundary(String sim_path, String force_path, int n, int m) {
     this.m = m;
     this.n = n;
-    output = createWriter(name);
+    output = createWriter(sim_path);
     output.println("%% Initial parameters.");
     output.print("; n = "+ n);
     output.print("; m = "+ m);
     output.println(";");
+    output1 = createWriter(force_path);
   }
 
 
@@ -126,9 +145,20 @@ class SaveVectorFieldFromBoundary {
     }
   }
 
+  void addForce(BodyUnion bodyunion, Field p) {
+    output1.print("(x-force, y-force): ");
+    for (int k=0; k < bodyunion.bodyList.size(); k++)  {
+      output1.print(bodyunion.bodyList.get(k).pressForce(p) +" ");
+      output1.print(", ");
+    }
+    output1.println(" ;; ");
+  }
+
   void finish() {
     output.flush(); // Writes the remaining data to the file
     output.close(); // Closes the file
+    output1.flush(); // Writes the remaining data to the file
+    output1.close(); // Closes the file
   }
 } 
 

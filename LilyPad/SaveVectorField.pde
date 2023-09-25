@@ -21,7 +21,6 @@ void setup(){
   data.finish();
 }
 ***********************************/
-
 class SaveVectorFieldForEllipse {
   PrintWriter output;
   PrintWriter output1;
@@ -74,7 +73,7 @@ class SaveVectorFieldForEllipse {
 
   void addForce(BodyUnion bodyunion, Field p) {
     output1.print("(x-force, y-force): ");
-    for (int k=0; k < bodyunion.bodyList.size(); k++) {
+    for (int k=0; k < bodyunion.bodyList.size(); k++)  {
       output1.print(bodyunion.bodyList.get(k).pressForce(p) +" ");
       output1.print(", ");
     }

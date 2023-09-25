@@ -91,6 +91,11 @@ float[][] parse_string_config(String lines) {
 // String output_force_path = "/Users/weilong/data/design_evaluation/force/";
 // String output_boundary_path = "/Users/weilong/data/design_evaluation/reproduced_boundaries/";
 
+//String input_path = "/Users/weilong/data/design_evaluation_check/designed_boundaries_check/";
+//String output_sim_path = "/Users/weilong/data/design_evaluation_check/sim/";
+//String output_force_path = "/Users/weilong/data/design_evaluation_check/force/";
+//String output_boundary_path = "/Users/weilong/data/design_evaluation_check/reproduced_boundaries/";
+
 String input_path = "./boundary_multiple/";
 String output_sim_path = "./reporduced_simulation/sim/";
 String output_force_path = "./reproduced_force/";

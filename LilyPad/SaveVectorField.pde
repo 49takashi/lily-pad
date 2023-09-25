@@ -80,7 +80,7 @@ class SaveVectorFieldForEllipse {
     output1.println(" ;; ");
   }
   
-  void saveConfig(float x, float y, float h, float a, float rotation, float pivot, int n, int m, Float shape) {
+  void saveConfig(float x, float y, float h, float a, float rotation, float pivot, int n, int m, float shape) {
     output2.print(x + ", ");
     output2.print(y + ", ");
     output2.print(h + ", ");
